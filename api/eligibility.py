@@ -1,24 +1,19 @@
-"""Decides which lots a given driver is allowed to use.
+"""Which lots this driver's permit actually covers.
 
-Covers ORD 5.1.1.2 (accept customer ID), 5.1.1.4 (accept customer records)
-and 5.1.4.1 (provide access to an authorized customer). In the UC.1 flow this
-is action UC.1.2, and it runs again before a reservation is recorded
-(UC.1.8), because a permit or a rule can change between the two.
-
-Nothing here is implemented yet. The signatures exist so the walking skeleton
-has something to call.
+UC.1.2, and again at UC.1.8 before the reservation is recorded. ORD 5.1.4.1.
 """
 
 
-def eligible_lots(permit_profile, candidate_lots):
-    """Return the subset of candidate_lots the permit actually covers.
+def eligible_lots(profile, candidate_lots):
+    """Keep only the lots this permit type is allowed to use."""
+    permit = profile["permit"]
+    return [lot for lot in candidate_lots if permit in lot["permits"]]
 
-    permit_profile comes from the Campus Identity & Permit System.
-    candidate_lots comes from administrator-maintained lot rules.
+
+def is_still_eligible(profile, lot):
+    """Same check, run again at reservation time.
+
+    Rules can change between the search and the moment the driver commits, so
+    we don't trust the earlier result.
     """
-    raise NotImplementedError
-
-
-def is_still_eligible(permit_profile, lot, arrival_time):
-    """Second check, run at reservation time rather than at search time."""
-    raise NotImplementedError
+    return profile["permit"] in lot["permits"]

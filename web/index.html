@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CampusPark</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 640px;
+         margin: 40px auto; padding: 0 16px; color: #1c1c1c; line-height: 1.5; }
+  h1 { margin-bottom: 4px; }
+  .sub { color: #666; margin-top: 0; }
+  label { display: block; margin-top: 14px; font-size: 14px; }
+  input, select { width: 100%; padding: 8px; font-size: 15px; margin-top: 4px; }
+  button { margin-top: 18px; padding: 9px 18px; font-size: 15px; cursor: pointer; }
+  .option { border: 1px solid #ddd; padding: 12px; margin-top: 10px; }
+  .option h3 { margin: 0 0 4px; font-size: 16px; }
+  .meta { color: #666; font-size: 14px; }
+  .ok { border: 1px solid #2e6b3a; padding: 14px; margin-top: 18px; }
+  .err { color: #8c1c13; margin-top: 14px; }
+  .note { color: #666; font-size: 13px; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1>CampusPark</h1>
+<p class="sub">Find parking you're actually allowed to use, and hold it before you drive over.</p>
+
+<label>Driver ID
+  <input id="driver" value="student01">
+</label>
+<label>Destination
+  <select id="destination"></select>
+</label>
+<label>Arrival time
+  <input id="arrival" value="09:00">
+</label>
+<label>How long (hours)
+  <input id="hours" type="number" value="2" min="1" max="8">
+</label>
+
+<button onclick="findParking()">Find parking</button>
+
+<div id="out"></div>
+
+<script>
+const out = document.getElementById("out");
+
+fetch("/api/destinations").then(r => r.json()).then(d => {
+  document.getElementById("destination").innerHTML =
+    d.destinations.map(x => `<option>${x}</option>`).join("");
+});
+
+function trip() {
+  return {
+    driver_id: document.getElementById("driver").value,
+    destination: document.getElementById("destination").value,
+    arrival: document.getElementById("arrival").value,
+    hours: Number(document.getElementById("hours").value)
+  };
+}
+
+async function findParking() {
+  out.innerHTML = "Checking your permit...";
+  const res = await fetch("/api/options", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(trip())
+  }).then(r => r.json());
+
+  if (res.error) { out.innerHTML = `<p class="err">${res.error}</p>`; return; }
+  if (!res.options.length) {
+    out.innerHTML = `<p class="err">Nothing open for a ${res.permit} permit at that time.</p>`;
+    return;
+  }
+
+  out.innerHTML = `<p class="meta">${res.options.length} option(s) for your ${res.permit} permit</p>` +
+    res.options.map(o => `
+      <div class="option">
+        <h3>${o.name}</h3>
+        <div class="meta">${o.walk_minutes} min walk · ${o.remaining} spaces left</div>
+        <button onclick="reserve('${o.lot_id}')">Reserve this one</button>
+      </div>`).join("");
+}
+
+async function reserve(lotId) {
+  const res = await fetch("/api/reserve", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({...trip(), lot_id: lotId})
+  }).then(r => r.json());
+
+  if (res.error) { out.innerHTML += `<p class="err">${res.error}</p>`; return; }
+
+  out.innerHTML = `
+    <div class="ok">
+      <strong>Reserved ${res.lot}</strong><br>
+      Confirmation ${res.confirmation}<br>
+      ${res.guidance}
+      <p class="note">${res.note}</p>
+    </div>`;
+}
+</script>
+</body>
+</html>

@@ -55,13 +55,27 @@ docs/                 SPEC.md, prompt log, notes that tie code back to the model
 
 The top-level folders follow the system context rather than a framework's default layout, so each external system in the model has one place in the code where it is dealt with.
 
+## Running it
+
+```
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/uvicorn api.main:app --reload
+```
+
+Then open http://127.0.0.1:8000. Try driver IDs `student01`, `staff01` and
+`visitor01`. They hold different permits, so they get different lots back,
+which is the point of the whole system.
+
 ## Status
 
-Early. The MBSE model is further along than the build.
+The model is further along than the build, which is the order the course asks for.
 
-Done so far: business and mission analysis, operational concept, system context and hierarchy, UC.1 modeled as use case, action, activity and sequence diagrams, and the operational requirements document imported into Innoslate.
+Done: business and mission analysis, operational concept, system context and hierarchy, UC.1 as use case, action, activity and sequence diagrams, the operational requirements document imported into Innoslate, and a walking skeleton that runs UC.1 end to end.
 
-Next: stakeholder needs and requirements, due October 4, then a walking skeleton that runs one end to end path with the two external services stubbed.
+The skeleton covers the success path. The permit system and the map service are fixture data, reservations live in memory and disappear on restart, and the ranking is walk time with capacity as a tie breaker rather than anything considered.
+
+Next: stakeholder needs and requirements, due October 4. Those settle how options should actually be ranked and what the system does when a permit check fails, a lot is full, or an external service is down. None of that is guessed at in the code today.
 
 ## Team
 

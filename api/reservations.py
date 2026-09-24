@@ -1,30 +1,43 @@
-"""Holds a space for a driver and records what was held.
+"""Hold a space and remember that we held it (UC.1.8, UC.1.9).
 
-UC.1.8 and UC.1.9 in the model. ORD 5.1.2.6 (provide transactions to the
-Reservation System) and 5.1.2.16 (provide a boarding-pass equivalent, here the
-reservation confirmation) sit behind this file.
+Everything lives in memory for now, so restarting the server clears the
+reservations. A database is fine to add later; it isn't what the milestone is
+checking.
 
-One thing worth being explicit about, because it shapes everything in here:
-availability is derived from configured capacity and existing reservations,
-not measured. A confirmed reservation means CampusPark has set capacity aside
-in its own records. It does not mean a sensor has seen an empty space. That
-limitation is documented in the BMA report and carries into the requirements.
+Worth repeating because it drives the whole design: remaining capacity is
+configured capacity minus reservations we recorded. It is not a measurement.
+A confirmation means we set capacity aside, not that a space is empty.
 """
 
+import uuid
 
-def reserve(driver_id, lot, arrival_time, duration):
-    """Record a reservation and return a confirmation.
-
-    Re-checks eligibility and remaining capacity first. Returns None when the
-    option is no longer available so the caller can send the driver back to
-    the option list.
-    """
-    raise NotImplementedError
+# reservation records, newest last
+_RESERVATIONS = []
 
 
 def remaining_capacity(lot, window):
-    """Reservable capacity for a lot over a time window.
+    taken = sum(
+        1 for r in _RESERVATIONS
+        if r["lot_id"] == lot["id"] and r["window"] == window
+    )
+    return lot["capacity"] - taken
 
-    Configured capacity minus reservations already recorded in that window.
-    """
-    raise NotImplementedError
+
+def reserve(profile, lot, destination, window):
+    """Record a reservation. Returns None if the lot filled up in the meantime."""
+    if remaining_capacity(lot, window) <= 0:
+        return None
+    record = {
+        "id": uuid.uuid4().hex[:8],
+        "driver_id": profile["driver_id"],
+        "lot_id": lot["id"],
+        "lot_name": lot["name"],
+        "destination": destination,
+        "window": window,
+    }
+    _RESERVATIONS.append(record)
+    return record
+
+
+def all_reservations():
+    return list(_RESERVATIONS)

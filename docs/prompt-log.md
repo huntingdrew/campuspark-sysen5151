@@ -58,6 +58,29 @@ report. Off nominal cases are listed as not specified rather than filled in.
 
 ---
 
+### 2026-09-24 · Hangting Zhu · Claude (Opus 5)
+
+**Asked for:** a walking skeleton covering UC.1 only, with the permit system
+and the map service returning fixture data, and the second eligibility and
+capacity check kept as a real step rather than skipped.
+
+**Produced:** implementations in `api/eligibility.py`, `api/ranking.py`,
+`api/reservations.py`, both integration clients, `api/main.py` with
+`/api/options` and `/api/reserve`, and `web/index.html`.
+
+**Checked by running it:** a student permit and a visitor permit get different
+lots back, remaining capacity drops from 15 to 14 after a reservation, a
+student trying to reserve the visitor garage is refused by the recheck at step
+8, and an unknown driver ID returns a message instead of an error page. The
+browser flow completes from the form through to a confirmation number.
+
+**Left deliberately undone:** ranking weights, error handling for a downed
+external service, persistence. Those depend on the stakeholder requirements
+due October 4, and filling them in now would put behaviour in the code that no
+requirement asks for.
+
+---
+
 ### Template for future entries
 
 ```

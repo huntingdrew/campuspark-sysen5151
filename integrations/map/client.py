@@ -1,19 +1,55 @@
-"""Talks to the Campus Map & Navigation Service.
+"""Campus Map & Navigation Service.
 
-Also outside our boundary. We send a location and route request, it returns
-lot locations and route information. Two calls in the UC.1 flow depend on it:
-building the option list (UC.1.4 and UC.1.5) and returning guidance after the
-reservation is recorded (UC.1.9).
-
-Stubbed, same reason as the permit client.
+Also outside the boundary, also read only, also stubbed. Distances are made up
+but the shape of the data is what we expect the real service to give us.
 """
+
+# walk_minutes is keyed by destination so the ordering changes depending on
+# where the driver is actually going.
+LOTS = [
+    {
+        "id": "A-lot",
+        "name": "A Lot",
+        "permits": ["student", "staff"],
+        "capacity": 40,
+        "walk_minutes": {"Duffield Hall": 14, "Statler Hotel": 18, "Vet School": 9},
+    },
+    {
+        "id": "hoy-garage",
+        "name": "Hoy Road Garage",
+        "permits": ["staff", "visitor"],
+        "capacity": 25,
+        "walk_minutes": {"Duffield Hall": 8, "Statler Hotel": 6, "Vet School": 16},
+    },
+    {
+        "id": "forest-home",
+        "name": "Forest Home Drive",
+        "permits": ["student"],
+        "capacity": 15,
+        "walk_minutes": {"Duffield Hall": 11, "Statler Hotel": 13, "Vet School": 7},
+    },
+    {
+        "id": "visitor-garage",
+        "name": "Visitor Parking Garage",
+        "permits": ["visitor"],
+        "capacity": 30,
+        "walk_minutes": {"Duffield Hall": 5, "Statler Hotel": 4, "Vet School": 20},
+    },
+]
+
+DESTINATIONS = ["Duffield Hall", "Statler Hotel", "Vet School"]
 
 
 def lots_near(destination):
-    """Return candidate lots with their locations, nearest first."""
-    raise NotImplementedError
+    """Candidate lots with a walk time to the destination (UC.1.5)."""
+    out = []
+    for lot in LOTS:
+        lot = dict(lot)
+        lot["walk_minutes"] = lot["walk_minutes"].get(destination, 15)
+        out.append(lot)
+    return out
 
 
-def route_to(lot, origin=None):
-    """Return navigation guidance for a reserved lot."""
-    raise NotImplementedError
+def route_to(lot, destination):
+    """One line of guidance. The real service returns an actual route."""
+    return f"Park at {lot['name']}, then about a {lot['walk_minutes']} minute walk to {destination}."
