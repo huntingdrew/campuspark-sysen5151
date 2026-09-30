@@ -51,6 +51,8 @@ integrations/permit/  Client for the Campus Identity & Permit System
 integrations/map/     Client for the Campus Map & Navigation Service
 web/                  Driver-facing interface
 docs/                 SPEC.md, prompt log, notes that tie code back to the model
+tests/                Chapter 3 acceptance cases, trace check, and named red tests
+.github/workflows/    Automatic Chapter 3 acceptance checks
 ```
 
 The top-level folders follow the system context rather than a framework's default layout, so each external system in the model has one place in the code where it is dealt with.
@@ -75,8 +77,26 @@ Done: business and mission analysis, operational concept, system context and hie
 
 The skeleton covers the success path. The permit system and the map service are fixture data, reservations live in memory and disappear on restart, and the ranking is walk time with capacity as a tie breaker rather than anything considered.
 
-Next: stakeholder needs and requirements, due October 4. Those settle how options should actually be ranked and what the system does when a permit check fails, a lot is full, or an external service is down. None of that is guessed at in the code today.
+Chapter 3: `docs/SPEC.md` now links 13 needs to 18 stakeholder requirements through 20 acceptance cases. It contains the data and AI response contracts. Each case has a named red test. One separate test checks that the SPEC, case list, and test names agree. The acceptance tests fail on purpose at this chapter, as the lab manual requires. They do not claim that the product passed field or user tests.
+
+The Chapter 3 measures and contracts are proposed for team and stakeholder review. The SPEC records the earlier 20% search-time and 90% usable-option targets alongside the newer draft measures so the team can review the differences.
+
+Next: review these proposed criteria and implement the named checks in later chapters. The walking skeleton still uses fixtures and memory. Chapter 3 adds the specification and acceptance checks; it does not add unreviewed application behavior.
+
+## Chapter 3 checks
+
+`docs/SPEC.md` is the specification used for later prompts and build work. It is kept at the existing repository path. See `tests/acceptance_cases.json` for the full 20-case need-to-requirement mapping.
+
+```text
+python -m pip install -r requirements-dev.txt
+python -m pytest tests/ -v
+```
+
+The Chapter 3 result is one passing trace check and 20 deliberately failing acceptance placeholders. Each failure names its need and criterion. Replace a placeholder with a real check when that criterion is implemented; the trace check also supports passing acceptance tests.
+
+[GitHub Actions](https://github.com/huntingdrew/campuspark-sysen5151/actions) runs `.github/workflows/chapter3-acceptance.yml` on pushes and pull requests. It first checks trace coverage, then runs the red acceptance suite. A failed acceptance test makes the job fail normally. The workflow does not hide failures or call them passing product tests.
 
 ## Team
 
 Hangting Zhu, Junjie Luo, Yixuan Zhu, Yuxin Wang
+

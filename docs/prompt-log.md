@@ -94,3 +94,25 @@ requirement asks for.
 
 **Checked:**
 ```
+
+
+### 2026-09-30 Chapter 3 specification and acceptance work
+
+**Requested by:** the Team 25 project user. No individual name is assigned to this entry.
+
+**Tool:** Codex.
+
+**Asked for:** complete the remaining Chapter 3.5 specification, data and AI response contracts, named failing tests, commit, and automatic checks in the existing CampusPark repository.
+
+**Inputs:** the saved CampusPark Chapter 3 report draft; Innoslate project 13360 with 13 needs, 18 stakeholder requirements, and 20 source links; the current Canvas assignment and rubric screenshots; Lab Manual Chapter 3; the existing specification and walking skeleton.
+
+**Produced:** an updated `docs/SPEC.md`; `tests/acceptance_cases.json`; 20 named tests in `tests/test_spec_acceptance.py`; one trace check in `tests/test_spec_coverage.py`; `requirements-dev.txt`; `.github/workflows/chapter3-acceptance.yml`; updated README instructions.
+
+**Assistant work:** copied the current draft need statements, requirement statements, MOEs, and validation criteria without changing their targets. Added repository criterion IDs and test names. Described current fixture fields and planned contract behavior separately. Flagged the earlier 20%/90% targets and the newer Chapter 3 proposals for review. This was drafting and technical review, not a claim that the team wrote these criteria without assistant help.
+
+**Technical checks run:** the local pytest run collected 21 tests. The trace check passed and all 20 acceptance placeholders failed with their named assertion messages. The process returned exit code 1. No syntax, collection, or dependency error caused those 20 failures. A separate review checked that all source statements, MOEs, and validation criteria matched the saved Chapter 3 data.
+
+**Human review:** the user authorized this repository work and confirmed the repository URL. Team adoption of the criteria, owner approval, and real user or field validation remain pending. No completed human review or stakeholder approval is claimed.
+
+**Build limits:** application code was not changed for this increment. The existing fixture services, time-window limits, and in-memory records remain. The named red suite follows the manual's Chapter 3 example. The AI contract is specified for later implementation; no live model service was called.
+
