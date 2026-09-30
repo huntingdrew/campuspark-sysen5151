@@ -1,0 +1,30 @@
+name: Chapter 3 acceptance
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the project
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install test tools
+        run: python -m pip install -r requirements-dev.txt
+      - name: Check need and test coverage
+        run: python -m pytest tests/test_spec_coverage.py -v
+      - name: Run the Chapter 3 red acceptance suite
+        run: python -m pytest tests/test_spec_acceptance.py -v
+
